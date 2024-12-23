@@ -1,6 +1,11 @@
 * 🍒 JavaScript 生态
   * JavaScript
     * [JavaScript应知应会](javascript_ecosystem/javascript/JavaScript应知应会)
+  * Vue
+    * [Vue应知应会](javascript_ecosystem/vue/Vue应知应会)
+  * NodeJS
+    * [NodeJS应知应会](javascript_ecosystem/nodejs/NodeJS应知应会)
+  
 * 🔨 **工具**
   * Git
     * [Git配置](tool/git/Git配置)
@@ -39,5 +44,5 @@
     * [Linux概述](tool/linux/Linux概述)
   * Nginx
     * [Nginx概述](tool/nginx/Nginx概述)
-  * NodeJS
-    * [NodeJS安装](tool/nodejs/NodeJS安装)
+  
+  

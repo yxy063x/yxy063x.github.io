@@ -1,4 +1,6 @@
-# 升级NodeJS
+# 安装
+
+## 升级NodeJS
 
 ```shell
 # 清除nodejs的cache
@@ -17,6 +19,24 @@ sudo n latest
 
 # 查看版本
 node -v 
+
+# 升级、降级版本
+sudo n 16.20.2
+```
+
+
+
+## 配置镜像源
+
+```shell
+# 原镜像
+# npm config set registry https://registry.npmjs.org/
+
+# 永久修改
+# 设置淘宝镜像
+npm config set registry https://registry.npmmirror.com
+
+npm config get registry
 ```
 
 
