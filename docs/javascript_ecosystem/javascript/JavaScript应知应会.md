@@ -28,7 +28,7 @@
 
 
 
-# ES5 基础
+# ES5
 
 ## 数据类型
 
@@ -501,3 +501,431 @@
     
 
 # ES6
+
+## let 和 const 命令
+
+- let
+
+  - 所声明的变量，只在let命令所在的代码块内有效（块级作用域）
+
+  - 同一个作用域不可使用 let 重复声明同一个变量
+
+  - 不存在变量提升
+
+- const
+
+  - 只在声明所在的块级作用域内有效
+  - 同一个作用域不可使用 const 重复声明同一个变量
+  - 不存在常量提升
+  - 声明一个只读的常量。一旦声明，常量的值就不能改变
+
+
+
+## 变量的解构赋值
+
+- 数组的解构赋值
+
+  ```javascript
+  let [foo, [[bar], baz]] = [1, [[2], 3]];
+  foo // 1
+  bar // 2
+  baz // 3
+  
+  let [ , , third] = ["foo", "bar", "baz"];
+  third // "baz"
+  
+  let [x, , y] = [1, 2, 3];
+  x // 1
+  y // 3
+  
+  let [head, ...tail] = [1, 2, 3, 4];
+  head // 1
+  tail // [2, 3, 4]
+  
+  let [x, y, ...z] = ['a'];
+  x // "a"
+  y // undefined
+  z // []
+  ```
+
+- 对象的解构赋值
+
+  - 对象的解构与数组有一个重要的不同。数组的元素是按次序排列的，变量的取值由它的位置决定；而对象的属性没有次序，变量必须与属性同名，才能取到正确的值。
+  - 如果解构失败，变量的值等于undefined。
+
+  ```javascript
+  let { bar, foo } = { foo: 'aaa', bar: 'bbb' };
+  foo // "aaa"
+  bar // "bbb"
+  
+  let { baz } = { foo: 'aaa', bar: 'bbb' };
+  baz // undefined
+  
+  // 对象的解构赋值的内部机制，是先找到同名属性(模式)，然后再赋给对应的变量。真正被赋值的是后者，而不是前者。
+  let { foo: baz } = { foo: 'aaa', bar: 'bbb' };
+  baz // "aaa"
+  ```
+
+- 字符串的解构赋值
+
+  ```javascript
+  const [a, b, c, d, e] = 'hello';
+  a // "h"
+  b // "e"
+  c // "l"
+  d // "l"
+  e // "o"
+  ```
+
+- 数值和布尔值的解构赋值
+
+  ```javascript
+  let {toString: s} = 123;
+  s === Number.prototype.toString // true
+  
+  let {toString: s} = true;
+  s === Boolean.prototype.toString // true
+  ```
+
+- 函数参数的解构赋值
+
+  ```javascript
+  function add([x, y]){
+    return x + y;
+  }
+  
+  add([1, 2]); // 3
+  ```
+
+- 用途
+
+  - 交换变量的值
+
+    ```javascript
+    let x = 1;
+    let y = 2;
+    
+    [x, y] = [y, x];
+    ```
+
+  - 从函数返回多个值
+
+    ```javascript
+    // 返回一个数组
+    
+    function example() {
+      return [1, 2, 3];
+    }
+    let [a, b, c] = example();
+    
+    // 返回一个对象
+    
+    function example() {
+      return {
+        foo: 1,
+        bar: 2
+      };
+    }
+    let { foo, bar } = example();
+    ```
+
+  - 函数参数的定义
+
+    ```javascript
+    // 参数是一组有次序的值
+    function f([x, y, z]) { ... }
+    f([1, 2, 3]);
+    
+    // 参数是一组无次序的值
+    function f({x, y, z}) { ... }
+    f({z: 3, y: 2, x: 1});
+    ```
+
+  - 提取 JSON 数据
+
+    ```javascript
+    let jsonData = {
+      id: 42,
+      status: "OK",
+      data: [867, 5309]
+    };
+    
+    let { id, status, data: number } = jsonData;
+    
+    console.log(id, status, number);
+    // 42, "OK", [867, 5309]
+    ```
+
+  - 函数参数的默认值
+
+    ```javascript
+    jQuery.ajax = function (url, {
+      async = true,
+      beforeSend = function () {},
+      cache = true,
+      complete = function () {},
+      crossDomain = false,
+      global = true,
+      // ... more config
+    } = {}) {
+      // ... do stuff
+    };
+    ```
+
+  - 遍历 Map 结构
+
+    ```javascript
+    // 任何部署了 Iterator 接口的对象，都可以用for...of循环遍历。Map 结构原生支持 Iterator 接口，配合变量的解构赋值，获取键名和键值就非常方便。
+    const map = new Map();
+    map.set('first', 'hello');
+    map.set('second', 'world');
+    
+    for (let [key, value] of map) {
+      console.log(key + " is " + value);
+    }
+    // first is hello
+    // second is world
+    
+    // 获取键名
+    for (let [key] of map) {
+      // ...
+    }
+    
+    // 获取键值
+    for (let [,value] of map) {
+      // ...
+    }
+    ```
+
+  - 输入模块的指定方法
+
+    ```javascript
+    const { SourceMapConsumer, SourceNode } = require("source-map");
+    ```
+
+
+
+## 字符串的扩展
+
+- ES6 加强了对 Unicode 的支持，允许采用\uxxxx形式表示一个字符，其中xxxx表示字符的 Unicode 码点。
+
+- ES6 为字符串添加了遍历器接口，使得字符串可以被for...of循环遍历。
+
+- 模板字符串
+
+  ```javascript
+  // 普通字符串
+  `In JavaScript '\n' is a line-feed.`
+  
+  // 多行字符串
+  `In JavaScript this is
+   not legal.`
+  
+  console.log(`string text line 1
+  string text line 2`);
+  
+  // 字符串中嵌入变量
+  let name = "Bob", time = "today";
+  `Hello ${name}, how are you ${time}?`
+  ```
+
+  
+
+## 函数的扩展
+
+- 函数参数的默认值
+
+  - 参数变量是默认声明的，在函数体中，不能用let或const再次声明。
+  - 使用参数默认值时，函数不能有同名参数。
+  - 指定了默认值以后，函数的length属性，将返回没有指定默认值的参数个数；如果设置了默认值的参数不是尾参数，那么length属性也不再计入后面的参数了。
+
+  ```javascript
+  function Point(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+  
+  const p = new Point();
+  p // { x: 0, y: 0 }
+  
+  ////
+  // 第二个参数对象提供默认值，可以省略，否则出错；同时，参数属性提供默认值
+  function fetch(url, { body = '', method = 'GET', headers = {} } = {}) {
+    console.log(method);
+  }
+  
+  fetch('http://example.com')
+  // "GET"
+  
+  ////
+  // 如果设置了默认值的参数不是尾参数，那么length属性也不再计入后面的参数了
+  (function (a = 0, b, c) {}).length // 0
+  (function (a, b = 1, c) {}).length // 1
+  ```
+
+- ES6 引入 rest 参数（形式为...变量名），用于获取函数的多余参数，这样就不需要使用arguments对象了。rest 参数搭配的变量是一个数组，该变量将多余的参数放入数组中。
+
+  - rest 参数之后不能再有其他参数（即只能是最后一个参数），否则会报错。
+  - 函数的length属性，不包括 rest 参数。
+
+  ```javascript
+  function add(...values) {
+    let sum = 0;
+  
+    for (var val of values) {
+      sum += val;
+    }
+  
+    return sum;
+  }
+  
+  add(2, 5, 3) // 10
+  ```
+
+- ES2016 规定只要函数参数使用了默认值、解构赋值、或者扩展运算符，那么函数内部就不能显式设定为严格模式，否则会报错。
+
+- 箭头函数
+
+  - 如果箭头函数的代码块部分多于一条语句，就要使用大括号将它们括起来，并且使用return语句返回。
+  - 由于大括号被解释为代码块，所以如果箭头函数直接返回一个对象，必须在对象外面加上括号，否则会报错。
+  - 箭头函数没有自己的this对象。
+  - 不可以当作构造函数，也就是说，不可以对箭头函数使用new命令，否则会抛出一个错误。
+  - 不可以使用arguments对象，该对象在函数体内不存在。如果要用，可以用 rest 参数代替。
+  - 不可以使用yield命令，因此箭头函数不能用作 Generator 函数。
+
+  ```javascript
+  var f = v => v;
+  
+  // 等同于
+  var f = function (v) {
+    return v;
+  };
+  
+  ////
+  // 如果箭头函数不需要参数或需要多个参数，就使用一个圆括号代表参数部分。
+  var f = () => 5;
+  // 等同于
+  var f = function () { return 5 };
+  
+  var sum = (num1, num2) => num1 + num2;
+  // 等同于
+  var sum = function(num1, num2) {
+    return num1 + num2;
+  };
+  
+  ```
+
+
+
+## 对象的扩展
+
+- ES6 允许在大括号里面，直接写入变量和函数，作为对象的属性和方法。
+
+  ```javascript
+  const foo = 'bar';
+  const baz = {foo};
+  baz // {foo: "bar"}
+  
+  // 等同于
+  const baz = {foo: foo};
+  ```
+
+  
+
+## Module 的语法
+
+- export 命令
+
+  - export 命令能够对外输出的就是三种接口：函数（Functions）， 类（Classes），var、let、const 声明的变量（Variables）。
+
+  ```javascript
+  // profile.js
+  var firstName = 'Michael';
+  var lastName = 'Jackson';
+  var year = 1958;
+  
+  export { firstName, lastName, year };	// 使用大括号指定所要输出的一组变量
+  
+  ////
+  // as别名
+  function v1() { ... }
+  function v2() { ... }
+  
+  export {
+    v1 as streamV1,
+    v2 as streamV2,
+    v2 as streamLatestVersion
+  };
+  
+  ////
+  // 整体输出
+  export * from 'my_module';
+  ```
+
+
+
+- import 命令
+
+  - import命令输入的变量都是只读的，因为它的本质是输入接口。也就是说，不允许在加载模块的脚本里面，改写接口。
+
+  ```javascript
+  // main.js
+  import { firstName, lastName, year } from './profile.js';
+  
+  function setName(element) {
+    element.textContent = firstName + ' ' + lastName;
+  }
+  
+  ////
+  // as 重命名
+  import { lastName as surname } from './profile.js';
+  
+  ////
+  // 整体加载模块
+  import * as circle from './circle';
+  ```
+
+
+
+- export default 命令
+
+  - 一个模块只能有一个默认输出，因此export default命令只能使用一次。
+
+  ```javascript
+  // export-default.js
+  export default function () {
+    console.log('foo');
+  }
+  
+  // import-default.js
+  import customName from './export-default';
+  customName(); // 'foo'
+  ```
+
+
+
+- import()
+
+  - 按需异步加载，import()返回 Promise
+  - import()加载模块成功以后，这个模块会作为一个对象，当作then方法的参数。因此，可以使用对象解构赋值的语法，获取输出接口。
+
+  ```javascript
+  button.addEventListener('click', event => {
+    import('./dialogBox.js')
+    .then(dialogBox => {
+      dialogBox.open();
+    })
+    .catch(error => {
+      /* Error handling */
+    })
+  });
+  
+  ////
+  // 对象解构
+  import('./myModule.js')
+  .then(({export1, export2}) => {
+    // ...·
+  });
+  ```
+
+  
