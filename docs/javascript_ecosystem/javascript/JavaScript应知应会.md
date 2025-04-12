@@ -1,12 +1,19 @@
 # 术语
 
 - DOM（Document Object Model）文档对象模型
+
 - JSON（JavaScript Object Notation）JavaScript对象符号（本质是字符串）
+
 - AJAX（Asynchronous JavaScript and XML）异步的 JavaScript 和 XML。AJAX 最大的优点是在不重新加载整个页面的情况下，可以与服务器交换数据并更新部分网页内容。AJAX 只能向同源网址（协议、域名、端口都相同）发出 HTTP 请求，如果发出跨域请求，就会报错。
+
 - NaN（Not a Number）非数
+
 - BOM（Browser Object Model）浏览器对象模型
+
 - ECMA（European Computer Manufacturers Association）欧洲计算机制造商协会
-- SPA（single-page app framework）单页面应用程序框架
+
+- SPA（single page application）单页面应用程序
+
 - ECMAScript 版本
 
   ECMAScript 6 也称为 ECMAScript 2015。

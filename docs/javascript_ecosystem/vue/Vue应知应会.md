@@ -15,6 +15,9 @@
   ```shell
   # 进入创建项目的目标父级目录
   vue create goldmine-admin
+  
+  # 预设选择之后再创建项目时，直接加载这个预设配置
+  vue create --preset test test
   ```
   
   预设选择
@@ -143,6 +146,15 @@
   import './test'
   ```
 
+- import 函数
+
+  ```javascript
+  // import()是运行时执行，即运行到这一句是便会加载指定的模块
+  if (login = true){
+       import ('./loginFun.js').then(...)
+   }
+  ```
+  
   
 
 ## export
@@ -158,26 +170,193 @@
 
 
 
+# 生命周期
+
+<img src="Vue应知应会.assets/vue_lifecycle.png" alt="vue_lifecycle" style="zoom:50%;" />
+
+
+
 # 组件
 
-在 vue 中，组件是可以重复使用的 vue 实例，拥有一个名为 options 的对象，用于定义组件的属性、方法、生命周期等。而父子组件，是一种层级关系，其中一个组件（父组件）内部使用了另一个组件（子组件）。
+在 vue 中，组件是可以重复使用的 **vue 实例**，所以它与 new Vue 接收相同的选项，例如 data、computed、watch、methods 以及生命周期钩子等。
+
+- data 必须是一个函数，因此每个实例可以维护一份被返回对象的独立的拷贝
+- computed 具有缓存功能；计算属性是基于它们的响应式依赖进行缓存的。只在相关响应式依赖（依赖的属性）发生改变时它们才会重新求值
+
+```javascript
+// 定义一个名为 button-counter 的新组件
+Vue.component('button-counter', {
+  data: function () {
+    return {
+      count: 0
+    }
+  },
+  template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+})
+
+<div id="components-demo">
+  <button-counter></button-counter>
+</div>
+```
+
+
+
+全局注册，也就是说它们在注册之后可以用在任何新创建的 Vue 根实例 (new Vue) 的模板中。
+
+**注意**全局注册的行为必须在根 Vue 实例 (通过 new Vue) 创建之前发生。
+
+```javascript
+Vue.component('component-a', { /* ... */ })
+Vue.component('component-b', { /* ... */ })
+Vue.component('component-c', { /* ... */ })
+
+new Vue({ el: '#app' })
+
+<div id="app">
+  <component-a></component-a>
+  <component-b></component-b>
+  <component-c></component-c>
+</div>
+```
+
+
+
+局部注册。全局注册往往是不够理想的。比如，如果你使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
+
+**注意**局部注册的组件在其子组件中不可用。
+
+```javascript
+var ComponentA = { /* ... */ }
+var ComponentB = { /* ... */ }
+var ComponentC = { /* ... */ }
+
+new Vue({
+  el: '#app',
+  components: {
+    'component-a': ComponentA,
+    'component-b': ComponentB
+  }
+})
+```
+
+
+
+而父子组件，是一种层级关系，其中一个组件（父组件）内部使用了另一个组件（子组件）。
 
 - 父组件向子组件传递属性，子组件声明 props
+
+- 每次父级组件发生变更时，子组件中所有的 prop 都将会刷新为最新的值。这意味着你不应该在一个子组件内部改变 prop。如果你这样做了，Vue 会在浏览器的控制台中发出警告。
+
+  ```javascript
+  Vue.component('blog-post', {
+    props: ['post'],
+    template: `
+      <div class="blog-post">
+        <h3>{{ post.title }}</h3>
+        <div v-html="post.content"></div>
+      </div>
+    `
+  })
+  
+  <blog-post
+    v-for="post in posts"
+    v-bind:key="post.id"
+    v-bind:post="post"
+  ></blog-post>
+  ```
+
+  
+
 - 子组件通过$emit 方法触发自定义事件，父组件通过@childEvent （$on）监听子组件触发的自定义事件，并在事件处理函数中接收子组件传递的数据
 
-```vue
-Vue.component(component)
-```
+  ```javascript
+  <blog-post
+    ...
+    v-on:enlarge-text="postFontSize += 0.1"
+  ></blog-post>
+  
+  <button v-on:click="$emit('enlarge-text')">
+    Enlarge text
+  </button>
+  ```
+
+  
 
 
 
 # 插件
 
 - 如果插件是一个对象，必须提供 install 方法。
+
 - 如果插件是一个函数，它会被作为 install 方法。install 方法调用时，会将 Vue 作为参数传入。
+
 - 该方法需要在调用 new Vue() 之前被调用。
 
-```vue
-Vue.use(plugin)
-```
+  ```javascript
+  // 调用 `MyPlugin.install(Vue)`
+  Vue.use(MyPlugin)
+  
+  new Vue({
+    // ...组件选项
+  })
+  ```
 
+  
+
+# 模板指令
+
+指令 (Directives) 是带有 `v-` 前缀的特殊 attribute。指令的职责是，当表达式的值改变时，将其产生的连带影响，响应式地作用于 DOM。
+
+一些指令能够接收一个“参数”，在指令名称之后以冒号表示。例如，`v-bind` 指令可以用于响应式地更新 HTML attribute。
+
+- v-bind
+
+  ```html
+  <!-- Mustache {{ }} 语法不能作用在 HTML attribute 上，遇到这种情况应该使用 v-bind 指令
+  	v-bind:html属性="vue表达式"
+  	在这里 id 是参数，告知 v-bind 指令将该元素的 id attribute 与表达式 dynamicId 的值绑定 -->
+  <div v-bind:id="dynamicId"></div>
+  
+  <!-- 方括号 [] 内的是动态参数 -->
+  <a v-bind:[attributeName]="url"> ... </a>
+  
+  <!-- 缩写 -->
+  <a :href="url">...</a>
+  ```
+
+
+
+
+- v-on
+
+  ```html
+  <!-- 完整语法 -->
+  <a v-on:click="doSomething">...</a>
+  
+  <!-- 缩写 -->
+  <a @click="doSomething">...</a>
+  
+  <!-- 动态参数的缩写 (2.6.0+) -->
+  <a @[event]="doSomething"> ... </a>
+  
+  <!-- 修饰符 (modifier) 是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定 -->
+  <form v-on:submit.prevent="onSubmit">...</form>
+  ```
+
+
+
+- v-model
+
+  - v-model 指令在表单 `<input>`、`<textarea>` 及 `<select>` 元素上创建双向数据绑定。它会根据控件类型自动选取正确的方法来更新元素。
+  - v-model 会忽略所有表单元素的 value、checked、selected attribute 的初始值而总是将 Vue 实例的数据作为数据来源。你应该通过 JavaScript 在组件的 data 选项中声明初始值。
+  - v-model 在内部为不同的输入元素使用不同的 property 并抛出不同的事件：
+    - text 和 textarea 元素使用 `value` property 和 `input` 事件；
+    - checkbox 和 radio 使用 `checked` property 和 `change` 事件；
+    - select 字段将 `value` 作为 prop 并将 `change` 作为事件。
+
+  ```html
+  <input v-model="message" placeholder="edit me">
+  <p>Message is: {{ message }}</p>
+  ```
+
+  
